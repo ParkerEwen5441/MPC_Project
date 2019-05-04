@@ -17,33 +17,44 @@ function param = compute_controller_base_parameters
     m2 = truck.m2;
     m3 = truck.m3;
     
-    A = [1+60*(-a10-a12)/m1, 60*a12/m1,              0;
-        60*a12/m2,           1+60*(-a20-a12-a23)/m2, 60*a23/m2;
-        0,                   60*a23/m3,              1+60*(-a30-a23)/m3];
-    B = [60/m1  0;
-         0      60/m2;
-         0      0];
+    A_c = [(-a10-a12)/m1, a12/m1, 0;
+         a12/m2, (-a20-a12-a23)/m2, a23/m2;
+         0, a23/m3, (-a30-a23)/m3];
+    B_c = [1/m1, 0;
+           0, 1/m2;
+           0,  0];
+    B_d = [60/m1 0 0;
+            0 60/m2 0;
+            0 0 60/m3];
+    d_c = [a10*T0 + w(1);
+           a20*T0 + w(2);
+           a30*T0 + w(3)];
+    sys = ss(A_c, B_c, eye(3), []);
+    sysd = c2d(sys, Ts);
+    A = sysd.A;
+    B = sysd.B;
+       
+    % (3) set point computation    
+    H = [1 0 0;
+         0 1 0];
+    A_sp = [eye(3) - A, -B; H, zeros(2, 2)];
+    b_sp = [B_d * d_c; [-20; 0.25]];
+    x_sp = A_sp \ b_sp;
     
-    % (3) set point computation
-    T3sp = (15*a23/m3 + 60*(a30*T0-w(3))/m3) / (-60*(-a30-a23)/m3);
-    
-    p1sp = (m1/60)*((-60*(-a10-a12)/m1)*(-20) - (60*a12/m1)*(0.25) - 60*(a10*T0+w(1))/m1);
-    p2sp = (m2/60)*((-60*a12/m2)*(-20) - (60*(-a20-a12-a23)/m2)*(0.25) - (60*a23/m2)*T3sp - 60*(a20*T0+w(2))/m2);
-    
-    T_sp = [-20; 0.25; T3sp];
-    p_sp = [p1sp; p2sp];
+    T_sp = x_sp(1:3);
+    p_sp = x_sp(4:5);
     
     % (4) system constraints
     Pcons = truck.InputConstraints;
     Tcons = truck.StateConstraints;
     
     % (4) constraints for delta formulation
-    Ucons = [-681.2 1818.8; -1373.8 626.25];
-    Xcons = [-Inf 10; -0.25 4.75; -Inf Inf];
+    Ucons = Pcons - p_sp;
+    Xcons = Tcons - T_sp;
     
     % (5) LQR cost function
-    Q = [60 0 0;
-         0 50 0;
+    Q = [3000 0 0;
+         0 1500 0;
          0 0 0];
     R = [0.05 0;
          0 0.05];
@@ -64,5 +75,6 @@ function param = compute_controller_base_parameters
     param.Xcons = Xcons;
     param.Tcons = Tcons;
     param.Pcons = Pcons;
+    param.counter = 0;
 end
 

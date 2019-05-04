@@ -15,17 +15,29 @@ function p = controller_lqr(T)
     end
     
     %compute infinite-horizon cost
-    J = [-17; 1.25; 6.1]' * param.P * [-17; 1.25; 6.1];
+  
     
     % compute control action
-    p = (param.F * T) + [-1818.8; -626.25];
+    T_in = T - param.T_sp;
+    p = (param.F * T_in) + param.p_sp;
+    param.counter = param.counter + 1;
+    
+    if param.counter == 1
+        param.J = (T-param.T_sp)' * param.P * (T-param.T_sp);
+    end
+    if (param.counter == 30) && ((norm(param.T_sp - T) <= (0.2 * norm([3, 1, 0]))))
+        disp(" ")
+        disp("-----------------------------")
+        disp("           T(30)             ")
+        disp("-----------------------------")
+        disp(T)
+        disp("Constraint is satisfied.")
+    else
+        disp("Constraint is not satisfied!")
+    end
+    
     end
 
 function param = init()
     param = compute_controller_base_parameters;
-    % add additional parameters if necessary, e.g.
-    [P,L,K] = dare(param.A, param.B, param.Q, param.R);
-    param.P = P;
-    param.F = -K;
-
 end
