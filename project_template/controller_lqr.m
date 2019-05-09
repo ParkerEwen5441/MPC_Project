@@ -14,17 +14,17 @@ function p = controller_lqr(T)
         param = init();
     end
     
-    %compute infinite-horizon cost
-  
-    
     % compute control action
     T_in = T - param.T_sp;
     p = (param.F * T_in) + param.p_sp;
     param.counter = param.counter + 1;
     
+    % compute infinite-horizon cost
     if param.counter == 1
         param.J = (T-param.T_sp)' * param.P * (T-param.T_sp);
     end
+    
+    % check state constraint given in problem
     if (param.counter == 30) && ((norm(param.T_sp - T) <= (0.2 * norm([3, 1, 0]))))
         disp(" ")
         disp("-----------------------------")
@@ -32,11 +32,11 @@ function p = controller_lqr(T)
         disp("-----------------------------")
         disp(T)
         disp("Constraint is satisfied.")
-    else
+    elseif (param.counter == 30)
         disp("Constraint is not satisfied!")
     end
     
-    end
+end
 
 function param = init()
     param = compute_controller_base_parameters;

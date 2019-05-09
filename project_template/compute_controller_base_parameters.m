@@ -65,6 +65,7 @@ function param = compute_controller_base_parameters
     % put everything together
     param.A = A;
     param.B = B;
+    param.Bd = B_d;
     param.Q = Q;
     param.R = R;
     param.P = P;

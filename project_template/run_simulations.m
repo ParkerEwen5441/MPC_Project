@@ -13,7 +13,7 @@ T0_2 = [-21; 0.15; 1.6];
 
 % LQR Controller Simulation
 % [T, p] = simulate_truck(T0_1, @controller_lqr, scen1);
-% [T, p] = simulate_truck(T0_2, @controller_lqr, scen1);
+[T, p] = simulate_truck(T0_2, @controller_lqr, scen1);
 
 % MPC Controller #1 Simulation
 % [T, p] = simulate_truck(T0_1, @controller_mpc_1, scen1);
@@ -25,4 +25,13 @@ T0_2 = [-21; 0.15; 1.6];
 
 % MPC Controller #3 Simulation
 % [T, p] =  simulate_truck(T0_1, @controller_mpc_3, scen1);
-[T, p] =  simulate_truck(T0_2, @controller_mpc_3, scen1);
+% [T, p] =  simulate_truck(T0_2, @controller_mpc_3, scen1);
+% [T, p] =  simulate_truck(T0_2, @controller_mpc_3, scen2);
+
+% MPC Controller #4 Simulation
+% [T, p] =  simulate_truck(T0_1, @controller_mpc_4, scen2);
+% [T, p] =  simulate_truck(T0_2, @controller_mpc_4, scen2);
+
+% MPC Controller #5 Simulation
+% [T, p] = simulate_truck(T0_1, @controller_mpc_5, scen3);
+
